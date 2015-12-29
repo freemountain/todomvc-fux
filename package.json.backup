@@ -1,0 +1,25 @@
+{
+  "private": true,
+  "dependencies": {
+    "babel": "^5.4.3",
+    "bus": "^0.1.0",
+    "clone": "^1.0.2",
+    "deku": "^0.3.0",
+    "express": "^4.12.3",
+    "hashchange": "^1.0.0",
+    "immutable": "^3.7.5",
+    "rx": "^4.0.7",
+    "tcomb": "^2.5.2",
+    "todomvc-app-css": "^2.0.0",
+    "todomvc-common": "^1.0.0"
+  },
+  "devDependencies": {
+    "babelify": "^6.1.1",
+    "browserify": "^10.2.0"
+  },
+  "scripts": {
+    "build": "mkdir -p build && browserify -d client/index.js -t [ babelify --jsxPragma 'dom' ] > build/index.js",
+    "clean": "rm -rf build",
+    "start": "node server/index.js"
+  }
+}
