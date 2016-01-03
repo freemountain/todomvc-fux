@@ -1,8 +1,15 @@
-var expect = require('chai').expect;
-var  t = require('tcomb');
-var types = require('../types');
+import {expect} from 'chai';
+import  t from 'tcomb';
+import Immutable from 'immutable';
+
+var types = require('./../types.js'); // import types from ... not working!!?
 
 describe('types', function () {
+  describe('isValidIrreducibleType', function() {
+    it('ss', function() {
+      //expect(types.ValidIrreducible.is(t.String)).to.equal(true);
+    });
+  })
   describe('isValidType()', function () {
     var irreducibles = [t.String, t.Number, t.Boolean, types.Record, t.enums.of(['foo', 'bar'])];
 
@@ -92,10 +99,10 @@ describe('types', function () {
       var structure = types.derriveStructure(A, init);
       var structureJS = structure.toJS();
       var fixture = { s: 'foo', n: 23, d: {}, l: [], r: { b: false, l: [] } };
-      expect(() => types.ImmutableList(structure.get('l')) ).not.to.throw(Error);
-      expect(() => types.ImmutableMap(structure.get('d')) ).not.to.throw(Error);
-      expect(() => types.ImmutableMap(structure.get('r')) ).not.to.throw(Error);
-      expect(() => types.ImmutableList(structure.get('r').get('l')) ).not.to.throw(Error);
+      expect(() => Immutable.List.isList(structure.get('l')) ).not.to.throw(Error);
+      expect(() => Immutable.Map.isMap(structure.get('d')) ).not.to.throw(Error);
+      expect(() => Immutable.Map.isMap(structure.get('r')) ).not.to.throw(Error);
+      expect(() => Immutable.List.isList(structure.get('r').get('l')) ).not.to.throw(Error);
       expect(structure.get('s')).to.equal('foo');
       expect(structure.get('n')).to.equal(23);
       expect(structure.get('r').get('b')).to.equal(false);

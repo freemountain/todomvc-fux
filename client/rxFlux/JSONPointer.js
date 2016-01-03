@@ -13,6 +13,10 @@ JSONPointer.prototype.toImmutable = function() {
   return this.path.join('.');
 };
 
+JSONPointer.prototype.head = function() {
+  return this.path[0];
+};
+
 JSONPointer.prototype.concat = function(x) {
   if(check(JSONPointer, x)) return JSONPointer({
     path: this.path.concat(x.path)
@@ -48,7 +52,7 @@ JSONPointer.create = function(s) {
   if(check(JSONPointer, s)) return JSONPointer(s);
 
   if(!t.String.is(s))
-    throw new Error('JSONPointer::create argument should be JSONPointer, Array<String> or String');
+    throw new Error('JSONPointer::create argument should be JSONPointer, Array<String> or String' + s);
 
   if(s === '') return JSONPointer({
     path: [] //pointer to root (rfc)

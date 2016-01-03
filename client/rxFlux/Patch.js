@@ -1,23 +1,23 @@
 import t from 'tcomb';
 import Immutable from 'immutable';
 
-import {matchString, check} from './types';
+import {specificString, check} from './types';
 
 const _Patch = t.struct({
   path: t.String,
 });
 
 export const AddPatch = _Patch.extend({
-  op: matchString('add'),
+  op: specificString('add'),
   value: t.Any
 }, 'AddPatch');
 
 export const RemovePatch = _Patch.extend({
-  op: matchString('remove')
+  op: specificString('remove')
 }, 'RemovePatch');
 
 export const ReplacePatch = _Patch.extend({
-  op: matchString('replace'),
+  op: specificString('replace'),
   value: t.Any
 }, 'ReplacePatch');
 

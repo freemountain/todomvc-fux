@@ -20,32 +20,35 @@ function mapPatch(spec, patch) {
   return Patch.update(patch, {path:{'$set': newPath}});
 }
 
-function rxStateView(state, spec) {
+function _log(v) {
+  console.log('_log: ', v);
+  return v;
+}
+function rxStateView(rootState, spec) {
   spec = Immutable
     .Map(spec)
     .map(prop => JSONPointer.create(prop));
 
-  var _State = spec.map(pointer => getSubType(state.type, pointer.path));
-  var State = t.struct(_State.toJS());
-  var getStateFromParent = () => spec.map(p => JSONPointer.apply(state.get(), p));
-/*  var getStateFromParent = () => spec.map(function(p) {
-    console.log('##!#', p);
-    return state.get(p);
-  });*/
+  var typeDescription = spec.map(pointer => getSubType(rootState.type, pointer.path));
+  var T = t.struct(typeDescription.toJS());
+  //var getStateFromParent = () => spec.map(p => JSONPointer.apply(rootState.get(), p));
+
+  var getStateFromParent = () => spec.map(p => rootState.get(_log(p)));
+
   var _state = getStateFromParent(); //initialState
 
   var view = {
     patch: new Rx.Subject(),
     diff: new Rx.Subject(),
     log: new Rx.Subject(),
-    type: State,
-    get: (pointer, toJS) => getSubValue(State, _state, pointer || [], toJS),
+    type: T,
+    get: (pointer, toJS) => getSubValue(T, _state, pointer || [], toJS),
     sub: (spec) => rxStateView(view, spec)
   };
 
-  view.log.subscribe(msg => state.log.onNext(msg));
+  view.log.subscribe(msg => rootState.log.onNext(msg));
 
-  state.diff.subscribe(function() {
+  rootState.diff.subscribe(function() {
     var newState = getStateFromParent();
     var delta = diff(_state, newState);
     if(delta.size === 0) return;
@@ -58,7 +61,7 @@ function rxStateView(state, spec) {
       .toJS()
       .map( p => mapPatch(spec, p) );
 
-    state.patch.onNext(Immutable.List(patch));
+    rootState.patch.onNext(Immutable.List(patch));
   });
 
   return view;

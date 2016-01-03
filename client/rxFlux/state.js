@@ -5,21 +5,23 @@ import patch from 'immutablepatch';
 import diff from 'immutablediff';
 
 import JSONPointer from './JSONPointer';
-import {check, unboxState, isValidType, validCheck, derriveStructure, getSubValue} from './types';
+import {isValidType, validCheck, derriveStructure, getSubValue} from './types';
+import * as meta from './meta';
+
 import stateView from './stateView';
 
-function state(stateType, init) {
-  if(!isValidType(stateType) || stateType.meta.kind !== 'struct')
-    throw new Error('stateType is not a valid root type');
+function state(T, init) {
+  if(!isValidType(T) || !meta.isStruct(T))
+    throw new Error('T is not a valid root type');
 
-  var state = derriveStructure(stateType, init);
+  var state = derriveStructure(T, init);
 
   var view = {
     patch: new Rx.Subject(),
     diff: new Rx.Subject(),
     log: new Rx.Subject(),
-    type: stateType,
-    get: (pointer, toJS) => getSubValue(stateType, state, pointer || [], toJS),
+    type: T,
+    get: (pointer, toJS) => getSubValue(T, state, pointer || [], toJS),
     sub: (spec) => stateView(view, spec)
   };
 
@@ -38,7 +40,7 @@ function state(stateType, init) {
       });
 
     var _state = patch(state, p);
-    if(!validCheck(stateType, _state)) {
+    if(!validCheck(T, _state)) {
       console.log('patch returned wrong type, val:', _state.toJS(), p.toJS());
       return;
     }
